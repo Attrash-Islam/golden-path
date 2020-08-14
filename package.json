@@ -1,0 +1,51 @@
+{
+  "name": "golden-path",
+  "version": "0.1.0",
+  "description": "Golden Path",
+  "keywords": [
+    "functional",
+    "path",
+    "golden"
+  ],
+  "main": "dist/index.js",
+  "typings": "index.d.ts",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.0.1",
+    "babel-loader": "^8.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.1",
+    "jest": "^26.0.1",
+    "ramda": "^0.27.0",
+    "webpack": "^4.43.0",
+    "webpack-bundle-analyzer": "^3.8.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "scripts": {
+    "build": "node_modules/.bin/webpack --config webpack.config.js",
+    "lint": "eslint .",
+    "test": "npm run build && jest"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Attrash-Islam/golden-path.git"
+  },
+  "author": "Islam Attrash <isattrash@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Attrash-Islam/golden-path/issues"
+  },
+  "homepage": "https://github.com/Attrash-Islam/golden-path",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
