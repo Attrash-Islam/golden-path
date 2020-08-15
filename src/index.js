@@ -1,7 +1,7 @@
 import { assocPath, path as rPath } from 'ramda';
 import resolvePaths from './resolvePaths';
 
-const GoldenPathUpdater = (unResolvedPath, value, object) => {
+const update = (unResolvedPath, value, object) => {
     const resolvedPath = resolvePaths(unResolvedPath, object);
     let objectResult = object;
 
@@ -18,4 +18,4 @@ const GoldenPathUpdater = (unResolvedPath, value, object) => {
     return objectResult;
 };
 
-export default GoldenPathUpdater;
+export { update };
