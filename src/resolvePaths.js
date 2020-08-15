@@ -3,6 +3,7 @@ import { path as rPath } from 'ramda';
 const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
 
 const EQUALITY_SYMBOLS = {
+    '!=': (x, y) => x !== y,
     '=': (x, y) => x === y,
     '>': (x, y) => x > y,
     '>=': (x, y) => x >= y,
@@ -17,13 +18,14 @@ const resolvePaths = (unResolvedPath, object) => {
     let i = 0;
     let buffer = '';
     let inConditionPhase = false;
+    let alreadyReachedLogicSymbol = false;
     let condition = {};
 
     while (i < unResolvedPath.length) {
         const isLast = i === unResolvedPath.length - 1;
         const token = unResolvedPath[i];
         // const prevToken = unResolvedPath[i - 1];
-        // const nextToken = unResolvedPath[i + 1];
+        const nextToken = unResolvedPath[i + 1];
 
         const normalizedBuffer = normalizeBuffer(buffer);
         let preValueArray;
@@ -47,34 +49,60 @@ const resolvePaths = (unResolvedPath, object) => {
                 inConditionPhase = true;
             break;
 
+            case '!':
             case '=':
             case '>':
             case '<':
+                if (alreadyReachedLogicSymbol) {
+                    buffer += token;
+                    break;
+                }
+
                 condition = {
                     prop: buffer,
                     logicSymbol: token
                 };
 
+                if (token === '>' && nextToken === '=') {
+                    condition.logicSymbol = '>=';
+                    i++;
+                }
+
+                if (token === '<' && nextToken === '=') {
+                    condition.logicSymbol = '<=';
+                    i++;
+                }
+
+                if (token === '!' && nextToken === '=') {
+                    condition.logicSymbol = '!=';
+                    i++;
+                }
+
                 buffer = '';
+                alreadyReachedLogicSymbol = true;
             break;
 
             case ']':
-                condition.value = eval(buffer);
-
-                inConditionPhase = false;
-                preValueArray = rPath(path, object);
-
-                arrayIndex = preValueArray.findIndex((item) => {
-                    const operator = EQUALITY_SYMBOLS[condition.logicSymbol];
-                    return operator(item[condition.prop], condition.value);
-                });
-
-                path.push(arrayIndex);
-                buffer = '';
+                if (isLast || nextToken === '.') {
+                    alreadyReachedLogicSymbol = false;
+                    condition.value = eval(buffer);
+    
+                    inConditionPhase = false;
+                    preValueArray = rPath(path, object);
+    
+                    arrayIndex = preValueArray.findIndex((item) => {
+                        const operator = EQUALITY_SYMBOLS[condition.logicSymbol];
+                        return operator(item[condition.prop], condition.value);
+                    });
+    
+                    path.push(arrayIndex);
+                    buffer = '';
+                } else {
+                    buffer += token;
+                }
             break;
 
             default:
-                // add to the query buffer.
                 buffer += token;
 
                 if (isLast) {
