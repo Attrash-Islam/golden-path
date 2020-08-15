@@ -18,4 +18,9 @@ const update = (unResolvedPath, value, object) => {
     return objectResult;
 };
 
-export { update };
+const get = (unResolvedPath, object) => {
+    const resolvedPath = resolvePaths(unResolvedPath, object);
+    return rPath(resolvedPath, object);
+};
+
+export { get, update };
