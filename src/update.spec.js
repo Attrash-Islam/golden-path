@@ -94,27 +94,33 @@ describe('update', () => {
     describe('Conditional Updates For Arrays', () => {
         describe('Equals Symbol', () => {
             it('should update array when conditions satisfied', () => {
-                const object = { peoples: [{ id: 1 } ] };
+                const object = { peoples: [{ id: 1 }, { id: 5 } ] };
                 const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
-                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }] });
+                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 5 }] });
             });
-    
+
             it('should update first existence when conditions satisfied for singular queries', () => {
                 const object = { peoples: [{ id: 1 }, { id: 1, other: true }] };
                 const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
                 expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 1, other: true }] });
             });
-    
+            
+            it('should update second item when first item type is not identical when conditions satisfied', () => {
+                const object = { peoples: [{ id: '1' }, { id: 1 }] };
+                const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: '1' }, { id: 10, name: 'islam' }] });
+            });
+
             it('should not update array when condition do not match', () => {
-                const object = { peoples: [{ id: 1 } ] };
+                const object = { peoples: [{ id: 1 }, { id: 3 } ] };
                 const result = update(`peoples[id=2]`, { id: 10, name: 'islam' }, object);
-                expect(result).toEqual({ peoples: [{ id: 1 } ] });
+                expect(result).toEqual({ peoples: [{ id: 1 }, { id: 3 } ] });
             });
     
             it('should update array deep property when conditions satisfied', () => {
-                const object = { peoples: [{ id: 1, name: 'islam' } ] };
+                const object = { peoples: [{ id: 1, name: 'islam' }, { id: 10, name: 'sabel' }] };
                 const result = update(`peoples[id=1].name`, 'sabel', object);
-                expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }] });
+                expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }, { id: 10, name: 'sabel' }] });
             });
     
             it('should update array deep deep property when conditions satisfied', () => {
@@ -126,15 +132,21 @@ describe('update', () => {
 
         describe('NotEquals Symbol', () => {
             it('should update array when conditions satisfied', () => {
-                const object = { peoples: [{ id: 2 } ] };
+                const object = { peoples: [{ id: 2 }, { id: 3 } ] };
                 const result = update(`peoples[id!=1]`, { id: 3, name: 'michael' }, object);
-                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }, { id: 3 }] });
             });
     
             it('should update first existence when conditions satisfied for singular queries', () => {
                 const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
                 const result = update(`peoples[id!=1]`, { id: 100, name: 'john' }, object);
                 expect(result).toEqual({ peoples: [{ id: 100, name: 'john' }, { id: 2, other: true }] });
+            });
+
+            it('should update relevant item when type is not identical when conditions satisfied', () => {
+                const object = { peoples: [{ id: '2' }, { id: '3' }] };
+                const result = update(`peoples[id!=2]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: '3' }] });
             });
     
             it('should not update array when condition do not match', () => {
@@ -144,15 +156,143 @@ describe('update', () => {
             });
     
             it('should update array deep property when conditions satisfied', () => {
-                const object = { peoples: [{ id: 2, name: 'islam' } ] };
+                const object = { peoples: [{ id: 2, name: 'islam' }, { id: 3, name: 'xx' } ] };
                 const result = update(`peoples[id!=1].name`, 'sabel', object);
-                expect(result).toEqual({ peoples: [{ id: 2, name: 'sabel' }] });
+                expect(result).toEqual({ peoples: [{ id: 2, name: 'sabel' }, { id: 3, name: 'xx' }] });
             });
     
             it('should update array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
                 const result = update(`peoples[name!='john'].friends[sex!='female'].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
+            });
+        });
+
+        describe('BiggerThan Symbol', () => {
+            it('should update array when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id>1]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
+            it('should update first existence when conditions satisfied for singular queries', () => {
+                const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
+                const result = update(`peoples[id>1]`, { id: 100, name: 'john' }, object);
+                expect(result).toEqual({ peoples: [{ id: 100, name: 'john' }, { id: 2, other: true }] });
+            });
+    
+            it('should not update array when condition do not match', () => {
+                const object = { peoples: [{ id: 1 } ] };
+                const result = update(`peoples[age>30]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1 } ] });
+            });
+    
+            it('should update array deep property when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2, name: 'islam' }, { id: 3, name: 'xx' } ] };
+                const result = update(`peoples[id>1].name`, 'sabel', object);
+                expect(result).toEqual({ peoples: [{ id: 2, name: 'sabel' }, { id: 3, name: 'xx' }] });
+            });
+    
+            it('should update array deep deep property when conditions satisfied', () => {
+                const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
+                const result = update(`peoples[name='islam'].friends[age>29].name`, 'Sohaib', object);
+                expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Sohaib' }, { age: 40, name: 'sabel' } ] } ] });
+            });
+        });
+
+        describe('BiggerThanEquals Symbol', () => {
+            it('should update array when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id>=1]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
+            it('should update first existence when conditions satisfied for singular queries', () => {
+                const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
+                const result = update(`peoples[id>=2]`, { id: 100, name: 'john' }, object);
+                expect(result).toEqual({ peoples: [{ id: 100, name: 'john' }, { id: 2, other: true }] });
+            });
+    
+            it('should not update array when condition do not match', () => {
+                const object = { peoples: [{ id: 1 } ] };
+                const result = update(`peoples[id>=10]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1 } ] });
+            });
+    
+            it('should update array deep property when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2, name: 'islam' }, { id: 3, name: 'xx' } ] };
+                const result = update(`peoples[id>=2].name`, 'sabel', object);
+                expect(result).toEqual({ peoples: [{ id: 2, name: 'sabel' }, { id: 3, name: 'xx' }] });
+            });
+    
+            it('should update array deep deep property when conditions satisfied', () => {
+                const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
+                const result = update(`peoples[name='islam'].friends[age>=30].name`, 'Sohaib', object);
+                expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Sohaib' }, { age: 40, name: 'sabel' } ] } ] });
+            });
+        });
+
+        describe('SmallerThan Symbol', () => {
+            it('should update array when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id<3]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
+            it('should update first existence when conditions satisfied for singular queries', () => {
+                const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
+                const result = update(`peoples[id<12]`, { id: 100, name: 'john' }, object);
+                expect(result).toEqual({ peoples: [{ id: 100, name: 'john' }, { id: 2, other: true }] });
+            });
+    
+            it('should not update array when condition do not match', () => {
+                const object = { peoples: [{ id: 1 } ] };
+                const result = update(`peoples[id<-2]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1 } ] });
+            });
+    
+            it('should update array deep property when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2, name: 'islam' }, { id: 3, name: 'xx' } ] };
+                const result = update(`peoples[id<3].name`, 'sabel', object);
+                expect(result).toEqual({ peoples: [{ id: 2, name: 'sabel' }, { id: 3, name: 'xx' }] });
+            });
+    
+            it('should update array deep deep property when conditions satisfied', () => {
+                const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
+                const result = update(`peoples[name='islam'].friends[age<30].name`, 'Sohaib', object);
+                expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'Sohaib' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] });
+            });
+        });
+
+        describe('SmallerThanEquals Symbol', () => {
+            it('should update array when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id<=2]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
+            it('should update first existence when conditions satisfied for singular queries', () => {
+                const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
+                const result = update(`peoples[id<=2]`, { id: 100, name: 'john' }, object);
+                expect(result).toEqual({ peoples: [{ id: 100, name: 'john' }, { id: 2, other: true }] });
+            });
+    
+            it('should not update array when condition do not match', () => {
+                const object = { peoples: [{ id: 1 } ] };
+                const result = update(`peoples[id<=-100]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1 } ] });
+            });
+    
+            it('should update array deep property when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2, name: 'islam' }, { id: 3, name: 'xx' } ] };
+                const result = update(`peoples[id<=2].name`, 'sabel', object);
+                expect(result).toEqual({ peoples: [{ id: 2, name: 'sabel' }, { id: 3, name: 'xx' }] });
+            });
+    
+            it('should update array deep deep property when conditions satisfied', () => {
+                const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
+                const result = update(`peoples[name='islam'].friends[age<=30].name`, 'Sohaib', object);
+                expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'Sohaib' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] });
             });
         });
     });
