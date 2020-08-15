@@ -113,7 +113,7 @@ describe('GoldenPathUpdater', () => {
         it('should update array deep deep property in equal conditions', () => {
             const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
             const result = GoldenPathUpdater(`peoples[name='islam'].friends[sex='male'].name`, 'Sohaib', object);
-            expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, {sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
+            expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
         });
     });
 });
