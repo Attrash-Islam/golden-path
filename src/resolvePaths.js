@@ -1,57 +1,92 @@
-const normalizeQuery = (q) => isNaN(q) ? q : parseInt(q);
+import { path as rPath } from 'ramda';
 
-const resolvePaths = (unResolvedPath) => {
+const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
+
+const EQUALITY_SYMBOLS = {
+    '=': (x, y) => x === y,
+    '>': (x, y) => x > y,
+    '>=': (x, y) => x >= y,
+    '<': (x, y) => x < y,
+    '<=': (x, y) => x <= y
+};
+
+const resolvePaths = (unResolvedPath, object) => {
+    // const isManyReturnType = unResolvedPath.indexOf('[*') > -1;
     let path = [];
 
     let i = 0;
-    let query = '';
-    let inConditionalClause = false;
-    // let conditionalData = [];
+    let buffer = '';
+    let inConditionPhase = false;
+    let condition = {};
 
     while (i < unResolvedPath.length) {
+        const isLast = i === unResolvedPath.length - 1;
         const token = unResolvedPath[i];
-        const normalizedQuery = normalizeQuery(query);
+        // const prevToken = unResolvedPath[i - 1];
+        // const nextToken = unResolvedPath[i + 1];
+
+        const normalizedBuffer = normalizeBuffer(buffer);
+        let preValueArray;
+        let arrayIndex;
 
         switch (token) {
+
             case '.':
-                if (query) { path.push(normalizedQuery); }
-                query = '';
+                if (inConditionPhase) {
+                    buffer += token;
+                    break;
+                }
+
+                if (buffer) { path.push(normalizedBuffer); }
+                buffer = '';
             break;
 
             case '[':
-                inConditionalClause = true;
-                if (query) { path.push(normalizedQuery); }
-                query = '';
+                if (buffer) { path.push(normalizedBuffer); }
+                buffer = '';
+                inConditionPhase = true;
+            break;
+
+            case '=':
+            case '>':
+            case '<':
+                condition = {
+                    prop: buffer,
+                    logicSymbol: token
+                };
+
+                buffer = '';
             break;
 
             case ']':
-                inConditionalClause = false;
-                // TODO execute the conditionalData object logic.
-            break;
+                condition.value = eval(buffer);
 
-            case '&':
-                if (!inConditionalClause) { throw new Error('can\'t use "&" outside of conditional clause.') }
-            break;
+                inConditionPhase = false;
+                preValueArray = rPath(path, object);
 
-            case '|':
-                if (!inConditionalClause) { throw new Error('can\'t use "|" outside of conditional clause.') }
+                arrayIndex = preValueArray.findIndex((item) => {
+                    const operator = EQUALITY_SYMBOLS[condition.logicSymbol];
+                    return operator(item[condition.prop], condition.value);
+                });
+
+                path.push(arrayIndex);
+                buffer = '';
             break;
 
             default:
                 // add to the query buffer.
-                query += token;
+                buffer += token;
+
+                if (isLast) {
+                    path.push(normalizeBuffer(buffer));
+                }
             break;
         }
 
         i++;
     }
 
-    // If query is buffered then this means that we've last data to push to the path array.
-    if (query.length > 0) {
-        path.push(normalizeQuery(query));
-    }
-
-    return [path];
+    return path;
 };
 
 export default resolvePaths;

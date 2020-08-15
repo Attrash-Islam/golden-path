@@ -1,21 +1,19 @@
-import { assocPath, path } from 'ramda';
+import { assocPath, path as rPath } from 'ramda';
 import resolvePaths from './resolvePaths';
 
 const GoldenPathUpdater = (unResolvedPath, value, object) => {
-    const resolvedPaths = resolvePaths(unResolvedPath);
+    const resolvedPath = resolvePaths(unResolvedPath, object);
     let objectResult = object;
 
-    resolvedPaths.forEach((resolvedPath) => {
-        let newVal = value;
+    let newVal = value;
 
-        if (typeof value === 'function') {
-            newVal = value(
-                path(resolvedPath, object)
-            );
-        }
+    if (typeof value === 'function') {
+        newVal = value(
+            rPath(resolvedPath, object)
+        );
+    }
 
-        objectResult = assocPath(resolvedPath, newVal, object)
-    });
+    objectResult = assocPath(resolvedPath, newVal, object)
 
     return objectResult;
 };

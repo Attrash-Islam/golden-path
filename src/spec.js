@@ -92,8 +92,28 @@ describe('GoldenPathUpdater', () => {
     });
 
     describe('Conditional Updates For Arrays', () => {
-        const object = { peoples: [{ id: 1 } ] };
-        const result = GoldenPathUpdater(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
-        expect(result).toEqual({ peoples: [{ id: 1, name: 'islam' }] })
+        it('should update array in equal conditions', () => {
+            const object = { peoples: [{ id: 1 } ] };
+            const result = GoldenPathUpdater(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
+            expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }] });
+        });
+
+        it('should update array deep property in equal conditions', () => {
+            const object = { peoples: [{ id: 1, name: 'islam' } ] };
+            const result = GoldenPathUpdater(`peoples[id=1].name`, 'sabel', object);
+            expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }] });
+        });
+
+        it('should update array deep property in equal conditions', () => {
+            const object = { peoples: [{ id: 1, name: 'islam' } ] };
+            const result = GoldenPathUpdater(`peoples[id=1].name`, 'sabel', object);
+            expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }] });
+        });
+
+        it('should update array deep deep property in equal conditions', () => {
+            const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
+            const result = GoldenPathUpdater(`peoples[name='islam'].friends[sex='male'].name`, 'Sohaib', object);
+            expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, {sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
+        });
     });
 });
