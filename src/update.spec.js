@@ -92,28 +92,68 @@ describe('update', () => {
     });
 
     describe('Conditional Updates For Arrays', () => {
-        it('should update array in equal conditions', () => {
-            const object = { peoples: [{ id: 1 } ] };
-            const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
-            expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }] });
+        describe('Equals Symbol', () => {
+            it('should update array when conditions satisfied', () => {
+                const object = { peoples: [{ id: 1 } ] };
+                const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }] });
+            });
+    
+            it('should update first existence when conditions satisfied for singular queries', () => {
+                const object = { peoples: [{ id: 1 }, { id: 1, other: true }] };
+                const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 1, other: true }] });
+            });
+    
+            it('should not update array when condition do not match', () => {
+                const object = { peoples: [{ id: 1 } ] };
+                const result = update(`peoples[id=2]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1 } ] });
+            });
+    
+            it('should update array deep property when conditions satisfied', () => {
+                const object = { peoples: [{ id: 1, name: 'islam' } ] };
+                const result = update(`peoples[id=1].name`, 'sabel', object);
+                expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }] });
+            });
+    
+            it('should update array deep deep property when conditions satisfied', () => {
+                const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
+                const result = update(`peoples[name='islam'].friends[sex='male'].name`, 'Sohaib', object);
+                expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
+            });
         });
 
-        it('should update array deep property in equal conditions', () => {
-            const object = { peoples: [{ id: 1, name: 'islam' } ] };
-            const result = update(`peoples[id=1].name`, 'sabel', object);
-            expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }] });
-        });
-
-        it('should update array deep property in equal conditions', () => {
-            const object = { peoples: [{ id: 1, name: 'islam' } ] };
-            const result = update(`peoples[id=1].name`, 'sabel', object);
-            expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }] });
-        });
-
-        it('should update array deep deep property in equal conditions', () => {
-            const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
-            const result = update(`peoples[name='islam'].friends[sex='male'].name`, 'Sohaib', object);
-            expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
+        describe('NotEquals Symbol', () => {
+            it('should update array when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id!=1]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+    
+            it('should update first existence when conditions satisfied for singular queries', () => {
+                const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
+                const result = update(`peoples[id!=1]`, { id: 100, name: 'john' }, object);
+                expect(result).toEqual({ peoples: [{ id: 100, name: 'john' }, { id: 2, other: true }] });
+            });
+    
+            it('should not update array when condition do not match', () => {
+                const object = { peoples: [{ id: 1 } ] };
+                const result = update(`peoples[id!=1]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1 } ] });
+            });
+    
+            it('should update array deep property when conditions satisfied', () => {
+                const object = { peoples: [{ id: 2, name: 'islam' } ] };
+                const result = update(`peoples[id!=1].name`, 'sabel', object);
+                expect(result).toEqual({ peoples: [{ id: 2, name: 'sabel' }] });
+            });
+    
+            it('should update array deep deep property when conditions satisfied', () => {
+                const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
+                const result = update(`peoples[name!='john'].friends[sex!='female'].name`, 'Sohaib', object);
+                expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
+            });
         });
     });
 });

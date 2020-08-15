@@ -94,7 +94,14 @@ const resolvePaths = (unResolvedPath, object) => {
                         const operator = EQUALITY_SYMBOLS[condition.logicSymbol];
                         return operator(item[condition.prop], condition.value);
                     });
-    
+
+                    if (arrayIndex === -1) {
+                        return {
+                            path,
+                            notExist: true
+                        };
+                    }
+
                     path.push(arrayIndex);
                     buffer = '';
                 } else {
@@ -114,7 +121,7 @@ const resolvePaths = (unResolvedPath, object) => {
         i++;
     }
 
-    return path;
+    return { path };
 };
 
 export default resolvePaths;
