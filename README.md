@@ -10,6 +10,8 @@ This module has the following functions:
 # Examples!
 
 ```js
+import { get, update, v } from 'golden-path';
+
 const object = { name: 'islam' };
 get('name', object); // 'islam'
 
