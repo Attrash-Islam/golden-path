@@ -6,6 +6,8 @@ const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
 const parseIt = (value) => {
     if (value === 'true') { return true; }
     if (value === 'false') { return false; }
+    if (value === 'undefined') { return undefined; }
+    if (value === 'null') { return null; }
 
     if (!isNaN(value)) { return Number(value); }
 

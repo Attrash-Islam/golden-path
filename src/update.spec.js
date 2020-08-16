@@ -99,6 +99,16 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 5 }] });
             });
 
+            it('should update array when conditions satisfied for undefined and null types', () => {
+                const object = { peoples: [{ id: undefined }, { id: 5 } ] };
+                const result = update(`peoples[id=undefined]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 5 }] });
+
+                const object2 = { peoples: [{ id: null }, { id: 5 } ] };
+                const result2 = update(`peoples[id=null]`, { id: 10, name: 'islam' }, object2);
+                expect(result2).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 5 }] });
+            });
+
             it('should update array when conditions satisfied when value is hashed', () => {
                 const object = { peoples: [{ id: 1 }, { id: 5 } ] };
                 const result = update(`peoples[id=${v(1)}]`, { id: 10, name: 'islam' }, object);
