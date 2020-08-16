@@ -44,6 +44,8 @@ const object = { peoples: [{ id: 1, age: 20 }, { id: 1, age: 30 }] };
 // update can take a value or a function that pass the current value as well!
 update(`peoples*[id=1][age>=20]`, (x) => ({...x, updated: true }), object);
 // { peoples: [{ id: 1, age: 20, updated: true }, { id: 1, age: 30, updated: true }] }
+
+// See spec.js files for more crazy stuff!
 ```
 
 # Install
