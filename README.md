@@ -24,8 +24,7 @@ get(`peoples[id=1]`, object); // { id: 1 } - Only returns first match
 const object = { peoples: [{ name: 'John' }, { name: 'Alex' }] };
 get(`peoples[name="Alex"]`, object); // { name: 'Alex' }
 
-// For dynamic data it's recommended to wrap with v() in order to
-// not break the parser.
+// For dynamic data it's recommended to wrap with v() in order to not break the parser.
 const nameFromServer = '[]&4%45.';
 const object = { peoples: [{ name: nameFromServer }, { name: 'x#DCGEDS' }] };
 get(`peoples[name="${v(nameFromServer)}"]`, object); // { name: '[]&4%45.' }
@@ -38,6 +37,7 @@ get(`peoples*[id=1][age>=20]`, object); // [{ id: 1, age: 20 }, { id: 1, age: 30
 
 const object = { peoples: [{ id: 1, age: 20, kind: 'human' }, { id: 1, age: 30, kind: 'robot' }] };
 get(`peoples*[id=1][age>=20].kind`, object); // ['human', 'robot']
+
 
 // The same can be done with update but update will return the whole root object after being updated.
 
