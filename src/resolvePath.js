@@ -4,7 +4,17 @@ import { TOKEN_HASH } from './constants';
 const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
 
 const parseIt = (value) => {
-    return eval(value);
+    if (value === 'true') { return true; }
+    if (value === 'false') { return false; }
+
+    if (!isNaN(value)) { return Number(value); }
+
+    // If a string.
+    if (['\'', '"', '`'].some((x) => value[0] === x && value[value.length - 1] === x)) {
+        return value.slice(1, value.length - 1);
+    }
+    
+    return value;
 };
 
 const EQUALITY_SYMBOLS = {
