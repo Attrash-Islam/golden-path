@@ -157,7 +157,7 @@ const resolvePath = (unResolvedPath, object) => {
 
                     if (ids.length === 0) {
                         return {
-                            path,
+                            isGreedy: true,
                             notExist: true
                         };
                     } else {
@@ -171,6 +171,7 @@ const resolvePath = (unResolvedPath, object) => {
                         });
 
                         return {
+                            isGreedy: true,
                             paths: finalPaths
                         };
                     }

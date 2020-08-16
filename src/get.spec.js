@@ -122,6 +122,12 @@ describe('get', () => {
                 expect(result).toEqual([true, false]);
             });
 
+            it('should return empty array when conditions don\'t satisfy in greedy queries', () => {
+                const object = { peoples: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }] };
+                const result = get(`peoples*[id=3].visited`, object);
+                expect(result).toEqual([]);
+            });
+
             it('should return array deep property when conditions satisfied in greedy queries when being the first token', () => {
                 const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
                 const result = get(`*[id=1]`, array);

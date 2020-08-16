@@ -27,8 +27,8 @@ const update = (unResolvedPath, value, object) => {
 };
 
 const get = (unResolvedPath, object) => {
-    let { path, paths, notExist } = resolvePath(unResolvedPath, object);
-    if (notExist) { return undefined; }
+    let { path, paths, notExist, isGreedy } = resolvePath(unResolvedPath, object);
+    if (notExist) { return isGreedy ? [] : undefined; }
 
     if (path) { return rPath(path, object); }
 
