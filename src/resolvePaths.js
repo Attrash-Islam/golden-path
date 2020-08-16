@@ -1,4 +1,5 @@
 import { path as rPath } from 'ramda';
+import { TOKEN_HASH } from './constants';
 
 const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
 
@@ -12,33 +13,54 @@ const EQUALITY_SYMBOLS = {
 };
 
 const resolvePaths = (unResolvedPath, object) => {
-    // const isManyReturnType = unResolvedPath.indexOf('[*') > -1;
     let path = [];
 
     let i = 0;
     let buffer = '';
-    let inConditionPhase = false;
-    let alreadyReachedLogicSymbol = false;
     let condition = {};
+    let isUserInput = false;
 
     while (i < unResolvedPath.length) {
         const isLast = i === unResolvedPath.length - 1;
         const token = unResolvedPath[i];
-        // const prevToken = unResolvedPath[i - 1];
         const nextToken = unResolvedPath[i + 1];
 
         const normalizedBuffer = normalizeBuffer(buffer);
         let preValueArray;
         let arrayIndex;
+        let isTokenHash;
+
+        isTokenHash = token === TOKEN_HASH[0] && unResolvedPath.slice(i, TOKEN_HASH.length + i) === TOKEN_HASH;
+
+        if (isTokenHash) {
+            if (!isUserInput) {
+                isUserInput = true;
+
+                // Skip token hash
+                i += TOKEN_HASH.length;
+                buffer = '';
+                continue;
+            } else {
+                isUserInput = false;
+                condition.value = eval(buffer);
+                buffer = '';
+
+                // Skip token hash
+                i += TOKEN_HASH.length;
+                continue;
+            }
+        }
+
+        // While being in token hash then add to buffer and continue to next loop.
+        if (isUserInput) {
+            buffer += token;
+            i++;
+            continue;
+        }
 
         switch (token) {
 
             case '.':
-                if (inConditionPhase) {
-                    buffer += token;
-                    break;
-                }
-
                 if (buffer) { path.push(normalizedBuffer); }
                 buffer = '';
             break;
@@ -46,17 +68,12 @@ const resolvePaths = (unResolvedPath, object) => {
             case '[':
                 if (buffer) { path.push(normalizedBuffer); }
                 buffer = '';
-                inConditionPhase = true;
             break;
 
             case '!':
             case '=':
             case '>':
             case '<':
-                if (alreadyReachedLogicSymbol) {
-                    buffer += token;
-                    break;
-                }
 
                 condition = {
                     prop: buffer,
@@ -79,34 +96,29 @@ const resolvePaths = (unResolvedPath, object) => {
                 }
 
                 buffer = '';
-                alreadyReachedLogicSymbol = true;
             break;
 
             case ']':
-                if (isLast || nextToken === '.') {
-                    alreadyReachedLogicSymbol = false;
+                if (!condition.value) {
                     condition.value = eval(buffer);
-    
-                    inConditionPhase = false;
-                    preValueArray = rPath(path, object);
-    
-                    arrayIndex = preValueArray.findIndex((item) => {
-                        const operator = EQUALITY_SYMBOLS[condition.logicSymbol];
-                        return operator(item[condition.prop], condition.value);
-                    });
-
-                    if (arrayIndex === -1) {
-                        return {
-                            path,
-                            notExist: true
-                        };
-                    }
-
-                    path.push(arrayIndex);
-                    buffer = '';
-                } else {
-                    buffer += token;
                 }
+
+                preValueArray = rPath(path, object);
+
+                arrayIndex = preValueArray.findIndex((item) => {
+                    const operator = EQUALITY_SYMBOLS[condition.logicSymbol];
+                    return operator(item[condition.prop], condition.value);
+                });
+
+                if (arrayIndex === -1) {
+                    return {
+                        path,
+                        notExist: true
+                    };
+                }
+
+                path.push(arrayIndex);
+                buffer = '';
             break;
 
             default:

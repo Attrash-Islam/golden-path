@@ -1,5 +1,6 @@
 import { assocPath, path as rPath } from 'ramda';
 import resolvePaths from './resolvePaths';
+import { TOKEN_HASH } from './constants';
 
 const update = (unResolvedPath, value, object) => {
     const { path, notExist } = resolvePaths(unResolvedPath, object);
@@ -27,4 +28,6 @@ const get = (unResolvedPath, object) => {
     return rPath(path, object);
 };
 
-export { get, update };
+const v = (value) => `${TOKEN_HASH}${value}${TOKEN_HASH}`;
+
+export { get, update, v };

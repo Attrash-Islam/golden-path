@@ -1,4 +1,4 @@
-import { update } from '.';
+import { update, v } from '.';
 
 describe('update', () => {
     it('should update one level path when exist', () => {
@@ -99,12 +99,18 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 5 }] });
             });
 
+            it('should update array when conditions satisfied when value is hashed', () => {
+                const object = { peoples: [{ id: 1 }, { id: 5 } ] };
+                const result = update(`peoples[id=${v(1)}]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 5 }] });
+            });
+
             it('should update first existence when conditions satisfied for singular queries', () => {
                 const object = { peoples: [{ id: 1 }, { id: 1, other: true }] };
                 const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
                 expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 1, other: true }] });
             });
-            
+
             it('should update second item when first item type is not identical when conditions satisfied', () => {
                 const object = { peoples: [{ id: '1' }, { id: 1 }] };
                 const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
@@ -136,7 +142,13 @@ describe('update', () => {
                 const result = update(`peoples[id!=1]`, { id: 3, name: 'michael' }, object);
                 expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }, { id: 3 }] });
             });
-    
+
+            it('should update array when conditions satisfied when value is hashed', () => {
+                const object = { peoples: [{ id: 2 }, { id: 3 } ] };
+                const result = update(`peoples[id!=${v(1)}]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }, { id: 3 }] });
+            });
+
             it('should update first existence when conditions satisfied for singular queries', () => {
                 const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
                 const result = update(`peoples[id!=1]`, { id: 100, name: 'john' }, object);
@@ -175,18 +187,24 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
             });
 
+            it('should update array when conditions satisfied when value is hashed', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id>${v(1)}]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
             it('should update first existence when conditions satisfied for singular queries', () => {
                 const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
                 const result = update(`peoples[id>1]`, { id: 100, name: 'john' }, object);
                 expect(result).toEqual({ peoples: [{ id: 100, name: 'john' }, { id: 2, other: true }] });
             });
-    
+
             it('should not update array when condition do not match', () => {
                 const object = { peoples: [{ id: 1 } ] };
                 const result = update(`peoples[age>30]`, { id: 10, name: 'islam' }, object);
                 expect(result).toEqual({ peoples: [{ id: 1 } ] });
             });
-    
+
             it('should update array deep property when conditions satisfied', () => {
                 const object = { peoples: [{ id: 2, name: 'islam' }, { id: 3, name: 'xx' } ] };
                 const result = update(`peoples[id>1].name`, 'sabel', object);
@@ -204,6 +222,12 @@ describe('update', () => {
             it('should update array when conditions satisfied', () => {
                 const object = { peoples: [{ id: 2 } ] };
                 const result = update(`peoples[id>=1]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
+            it('should update array when conditions satisfied when value is hashed', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id>=${v(1)}]`, { id: 3, name: 'michael' }, object);
                 expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
             });
 
@@ -239,6 +263,12 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
             });
 
+            it('should update array when conditions satisfied when value is hashed', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id<${v(3)}]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
             it('should update first existence when conditions satisfied for singular queries', () => {
                 const object = { peoples: [{ id: 2 }, { id: 2, other: true }] };
                 const result = update(`peoples[id<12]`, { id: 100, name: 'john' }, object);
@@ -268,6 +298,12 @@ describe('update', () => {
             it('should update array when conditions satisfied', () => {
                 const object = { peoples: [{ id: 2 } ] };
                 const result = update(`peoples[id<=2]`, { id: 3, name: 'michael' }, object);
+                expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
+            });
+
+            it('should update array when conditions satisfied when value is hashed', () => {
+                const object = { peoples: [{ id: 2 } ] };
+                const result = update(`peoples[id<=${v(2)}]`, { id: 3, name: 'michael' }, object);
                 expect(result).toEqual({ peoples: [{ id: 3, name: 'michael' }] });
             });
 
