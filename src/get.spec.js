@@ -100,6 +100,15 @@ describe('get', () => {
                 const result = get(`peoples[id=2]`, object);
                 expect(result).toEqual(undefined);
             });
+
+            it('should return array deep property when conditions satisfied in first match queries when being the first token', () => {
+                const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
+                const result = get(`[id=1]`, array);
+                expect(result).toEqual({ id: 1, name: 'islam', visited: true });
+
+                const result2 = get(`[id=1].name`, array);
+                expect(result2).toEqual('islam');
+            });
     
             it('should return array item deep property when conditions satisfied', () => {
                 const object = { peoples: [{ id: 1, name: 'islam' }, { id: 10, name: 'sabel' }] };
@@ -107,10 +116,19 @@ describe('get', () => {
                 expect(result).toEqual('islam');
             });
 
-            it('should update array deep property when conditions satisfied in greedy queries', () => {
+            it('should return array deep property when conditions satisfied in greedy queries', () => {
                 const object = { peoples: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }] };
                 const result = get(`peoples*[id=1].visited`, object);
                 expect(result).toEqual([true, false]);
+            });
+
+            it('should return array deep property when conditions satisfied in greedy queries when being the first token', () => {
+                const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
+                const result = get(`*[id=1]`, array);
+                expect(result).toEqual([{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }]);
+
+                const result2 = get(`*[id=1].name`, array);
+                expect(result2).toEqual(['islam', 'sabel']);
             });
     
             it('should return array deep deep property when conditions satisfied', () => {
