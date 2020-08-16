@@ -27,10 +27,12 @@ const update = (unResolvedPath, value, object) => {
 };
 
 const get = (unResolvedPath, object) => {
-    const { path, notExist } = resolvePath(unResolvedPath, object);
+    let { path, paths, notExist } = resolvePath(unResolvedPath, object);
     if (notExist) { return undefined; }
 
-    return rPath(path, object);
+    if (path) { return rPath(path, object); }
+
+    if (paths) { return paths.map((p) => rPath(p, object)); }
 };
 
 const v = (value) => `${TOKEN_HASH}${value}${TOKEN_HASH}`;
