@@ -2,6 +2,8 @@
 
 Golden Path is a functional (immutable) query tiny parser that can give you the chance to do your object/array queries and updates on the fly.
 
+![Webp net-resizeimage](https://user-images.githubusercontent.com/7091543/90341365-bd16c380-e007-11ea-8f7a-d5024917d8ee.png)
+
 This module has the following functions:
   - get
   - update
