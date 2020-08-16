@@ -3,6 +3,14 @@ import { TOKEN_HASH } from './constants';
 
 const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
 
+const parseIt = (value) => {
+    try {
+        return eval(value);
+    } catch (e) {
+        return `${value}`;
+    }
+};
+
 const EQUALITY_SYMBOLS = {
     '!=': (x, y) => x !== y,
     '=': (x, y) => x === y,
@@ -20,6 +28,7 @@ const resolvePaths = (unResolvedPath, object) => {
     let conditions = [];
     let conditionIndex = 0;
     let isUserInput = false;
+    let isAfterLogicOp = false;
 
     while (i < unResolvedPath.length) {
         const isLast = i === unResolvedPath.length - 1;
@@ -39,12 +48,14 @@ const resolvePaths = (unResolvedPath, object) => {
 
                 // Skip token hash
                 i += TOKEN_HASH.length;
-                buffer = '';
                 continue;
             } else {
                 isUserInput = false;
-                conditions[conditionIndex].value = eval(buffer);
-                buffer = '';
+
+                if (isAfterLogicOp) {
+                    conditions[conditionIndex].value = parseIt(buffer);
+                    buffer = '';
+                }
 
                 // Skip token hash
                 i += TOKEN_HASH.length;
@@ -103,18 +114,22 @@ const resolvePaths = (unResolvedPath, object) => {
                 }
 
                 buffer = '';
+                isAfterLogicOp = true;
             break;
 
             case ']':
+                isAfterLogicOp = false;
+
                 if (!conditions[conditionIndex].value) {
-                    conditions[conditionIndex].value = eval(buffer);
+                    conditions[conditionIndex].value = parseIt(buffer);
                 }
 
                 if (nextToken === '[') {
                     conditionIndex++;
                     buffer = '';
-                    // Skip next token
-                    i++;
+
+                    // Skip next token and move iterator to the next
+                    i += 2;
                     continue;
                 }
 

@@ -117,6 +117,20 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 1, other: false }, { id: 10, name: 'islam' }] });
             });
 
+            it('should update relevant existence when multiple conditions are used with complex string value', () => {
+                const complexString = '[]&%.';
+                const object = { peoples: [{ id: 1, other: false }, { id: 1, other: complexString }] };
+                const result = update(`peoples[id=1][other=${v(complexString)}]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1, other: false }, { id: 10, name: 'islam' }] });
+            });
+
+            it('should update relevant existence when multiple conditions are used with complex string key', () => {
+                const complexString = '[]&%.';
+                const object = { peoples: [{ id: 1, other: false }, { id: 1, [complexString]: 1 }] };
+                const result = update(`peoples[id=1][${v(complexString)}=1]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1, other: false }, { id: 10, name: 'islam' }] });
+            });
+
             it('should update second item when first item type is not identical when conditions satisfied', () => {
                 const object = { peoples: [{ id: '1' }, { id: 1 }] };
                 const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
@@ -137,7 +151,7 @@ describe('update', () => {
     
             it('should update array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
-                const result = update(`peoples[name='islam'].friends[sex='male'].name`, 'Sohaib', object);
+                const result = update(`peoples[name=islam].friends[sex=male].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
             });
         });
@@ -181,7 +195,7 @@ describe('update', () => {
     
             it('should update array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
-                const result = update(`peoples[name!='john'].friends[sex!='female'].name`, 'Sohaib', object);
+                const result = update(`peoples[name!=john].friends[sex!=female].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
             });
         });
@@ -219,7 +233,7 @@ describe('update', () => {
     
             it('should update array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
-                const result = update(`peoples[name='islam'].friends[age>29].name`, 'Sohaib', object);
+                const result = update(`peoples[name=islam].friends[age>29].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Sohaib' }, { age: 40, name: 'sabel' } ] } ] });
             });
         });
@@ -257,7 +271,7 @@ describe('update', () => {
     
             it('should update array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
-                const result = update(`peoples[name='islam'].friends[age>=30].name`, 'Sohaib', object);
+                const result = update(`peoples[name=islam].friends[age>=30].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Sohaib' }, { age: 40, name: 'sabel' } ] } ] });
             });
         });
@@ -295,7 +309,7 @@ describe('update', () => {
     
             it('should update array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
-                const result = update(`peoples[name='islam'].friends[age<30].name`, 'Sohaib', object);
+                const result = update(`peoples[name=islam].friends[age<30].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'Sohaib' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] });
             });
         });
@@ -333,7 +347,7 @@ describe('update', () => {
     
             it('should update array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ age: 20, name: 'max' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] };
-                const result = update(`peoples[name='islam'].friends[age<=30].name`, 'Sohaib', object);
+                const result = update(`peoples[name=islam].friends[age<=30].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ age: 20, name: 'Sohaib' }, { age: 30, name: 'Aseel' }, { age: 40, name: 'sabel' } ] } ] });
             });
         });
