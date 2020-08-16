@@ -166,6 +166,181 @@ describe('update', () => {
                 const result = update(`peoples[name='islam'].friends[sex='male'].name`, 'Sohaib', object);
                 expect(result).toEqual({ peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'Sohaib' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] });
             });
+
+            it('should update array deep deep property when conditions satisfied in multiple greedy queries', () => {
+                const object = {
+                    peoples: [
+                        {
+                            name: 'Islam',
+                            sex: 'male',
+                            friends: [
+                                {
+                                    sex: 'male',
+                                    name: 'max'
+                                },
+                                {
+                                    sex: 'male',
+                                    name: 'Aseel'
+                                },
+                                {
+                                    sex: 'female',
+                                    name: 'sabel'
+                                }
+                            ]
+                        },
+                        {
+                            name: 'Harel',
+                            sex: 'male',
+                            friends: [
+                                {
+                                    sex: 'male',
+                                    name: 'Max'
+                                },
+                                {
+                                    sex: 'male',
+                                    name: 'Aseel'
+                                },
+                                {
+                                    sex: 'female',
+                                    name: 'sabel'
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const result = update(`peoples*[sex='male'].friends*[sex='male'].name`, 'Sohaib', object);
+                expect(result).toEqual(
+                    {
+                        peoples: [
+                            {
+                                name: 'Islam',
+                                sex: 'male',
+                                friends: [
+                                    {
+                                        sex: 'male',
+                                        name: 'Sohaib'
+                                    },
+                                    {
+                                        sex: 'male',
+                                        name: 'Sohaib'
+                                    },
+                                    {
+                                        sex: 'female',
+                                        name: 'sabel'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'Harel',
+                                sex: 'male',
+                                friends: [
+                                    {
+                                        sex: 'male',
+                                        name: 'Sohaib'
+                                    },
+                                    {
+                                        sex: 'male',
+                                        name: 'Sohaib'
+                                    },
+                                    {
+                                        sex: 'female',
+                                        name: 'sabel'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                );
+            });
+
+
+            it('should update array deep deep property when conditions satisfied in single greedy queries', () => {
+                const object = {
+                    peoples: [
+                        {
+                            name: 'Islam',
+                            sex: 'male',
+                            friends: [
+                                {
+                                    sex: 'male',
+                                    name: 'max'
+                                },
+                                {
+                                    sex: 'male',
+                                    name: 'Aseel'
+                                },
+                                {
+                                    sex: 'female',
+                                    name: 'sabel'
+                                }
+                            ]
+                        },
+                        {
+                            name: 'Harel',
+                            sex: 'male',
+                            friends: [
+                                {
+                                    sex: 'male',
+                                    name: 'Max'
+                                },
+                                {
+                                    sex: 'male',
+                                    name: 'Aseel'
+                                },
+                                {
+                                    sex: 'female',
+                                    name: 'sabel'
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const result = update(`peoples*[sex='male'].friends[sex='male'].name`, 'Sohaib', object);
+                expect(result).toEqual(
+                    {
+                        peoples: [
+                            {
+                                name: 'Islam',
+                                sex: 'male',
+                                friends: [
+                                    {
+                                        sex: 'male',
+                                        name: 'Sohaib'
+                                    },
+                                    {
+                                        sex: 'male',
+                                        name: 'Aseel'
+                                    },
+                                    {
+                                        sex: 'female',
+                                        name: 'sabel'
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'Harel',
+                                sex: 'male',
+                                friends: [
+                                    {
+                                        sex: 'male',
+                                        name: 'Sohaib'
+                                    },
+                                    {
+                                        sex: 'male',
+                                        name: 'Aseel'
+                                    },
+                                    {
+                                        sex: 'female',
+                                        name: 'sabel'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                );
+            });
         });
 
         describe('NotEquals Symbol', () => {

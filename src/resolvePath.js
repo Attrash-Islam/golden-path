@@ -151,7 +151,7 @@ const resolvePath = (unResolvedPath, object) => {
                     } else {
                         let finalPaths = [];
 
-                        const results = ids.map((id) => resolvePath(`${path.join('.')}.${id}${unResolvedPath.slice(i + 1)}`));
+                        const results = ids.map((id) => resolvePath(`${path.join('.')}.${id}${unResolvedPath.slice(i + 1)}`, object));
                         results.forEach(({ path, notExist, paths }) => {
                             if (notExist) { return; }
                             if (path) { finalPaths.push(path); }
