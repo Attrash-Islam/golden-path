@@ -155,7 +155,7 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }, { id: 10, name: 'sabel' }] });
             });
 
-            it('should update array deep property when conditions satisfied', () => {
+            it('should update array deep property when conditions satisfied in greedy queries', () => {
                 const object = { peoples: [{ id: 1, name: 'islam' }, { id: 1, name: 'sabel' }] };
                 const result = update(`peoples*[id=1].visited`, true, object);
                 expect(result).toEqual({ peoples: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: true }] });
