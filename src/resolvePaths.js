@@ -4,11 +4,7 @@ import { TOKEN_HASH } from './constants';
 const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
 
 const parseIt = (value) => {
-    try {
-        return eval(value);
-    } catch (e) {
-        return `${value}`;
-    }
+    return eval(value);
 };
 
 const EQUALITY_SYMBOLS = {
@@ -28,7 +24,6 @@ const resolvePaths = (unResolvedPath, object) => {
     let conditions = [];
     let conditionIndex = 0;
     let isUserInput = false;
-    let isAfterLogicOp = false;
 
     while (i < unResolvedPath.length) {
         const isLast = i === unResolvedPath.length - 1;
@@ -51,11 +46,6 @@ const resolvePaths = (unResolvedPath, object) => {
                 continue;
             } else {
                 isUserInput = false;
-
-                if (isAfterLogicOp) {
-                    conditions[conditionIndex].value = parseIt(buffer);
-                    buffer = '';
-                }
 
                 // Skip token hash
                 i += TOKEN_HASH.length;
@@ -86,7 +76,6 @@ const resolvePaths = (unResolvedPath, object) => {
             case '=':
             case '>':
             case '<':
-
                 conditions[conditionIndex] = {
                     prop: buffer,
                     logicSymbol: token
@@ -114,12 +103,9 @@ const resolvePaths = (unResolvedPath, object) => {
                 }
 
                 buffer = '';
-                isAfterLogicOp = true;
             break;
 
             case ']':
-                isAfterLogicOp = false;
-
                 if (!conditions[conditionIndex].value) {
                     conditions[conditionIndex].value = parseIt(buffer);
                 }
