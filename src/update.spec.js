@@ -111,6 +111,12 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 1, other: true }] });
             });
 
+            it('should update relevant existence when multiple conditions are used', () => {
+                const object = { peoples: [{ id: 1, other: false }, { id: 1, other: true }] };
+                const result = update(`peoples[id=1][other=true]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 1, other: false }, { id: 10, name: 'islam' }] });
+            });
+
             it('should update second item when first item type is not identical when conditions satisfied', () => {
                 const object = { peoples: [{ id: '1' }, { id: 1 }] };
                 const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);

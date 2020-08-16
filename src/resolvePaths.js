@@ -17,7 +17,8 @@ const resolvePaths = (unResolvedPath, object) => {
 
     let i = 0;
     let buffer = '';
-    let condition = {};
+    let conditions = [];
+    let conditionIndex = 0;
     let isUserInput = false;
 
     while (i < unResolvedPath.length) {
@@ -42,7 +43,7 @@ const resolvePaths = (unResolvedPath, object) => {
                 continue;
             } else {
                 isUserInput = false;
-                condition.value = eval(buffer);
+                conditions[conditionIndex].value = eval(buffer);
                 buffer = '';
 
                 // Skip token hash
@@ -75,23 +76,29 @@ const resolvePaths = (unResolvedPath, object) => {
             case '>':
             case '<':
 
-                condition = {
+                conditions[conditionIndex] = {
                     prop: buffer,
                     logicSymbol: token
                 };
 
                 if (token === '>' && nextToken === '=') {
-                    condition.logicSymbol = '>=';
+                    conditions[conditionIndex].logicSymbol = '>=';
+
+                    // Skip next token
                     i++;
                 }
 
                 if (token === '<' && nextToken === '=') {
-                    condition.logicSymbol = '<=';
+                    conditions[conditionIndex].logicSymbol = '<=';
+
+                    // Skip next token
                     i++;
                 }
 
                 if (token === '!' && nextToken === '=') {
-                    condition.logicSymbol = '!=';
+                    conditions[conditionIndex].logicSymbol = '!=';
+
+                    // Skip next token
                     i++;
                 }
 
@@ -99,15 +106,25 @@ const resolvePaths = (unResolvedPath, object) => {
             break;
 
             case ']':
-                if (!condition.value) {
-                    condition.value = eval(buffer);
+                if (!conditions[conditionIndex].value) {
+                    conditions[conditionIndex].value = eval(buffer);
+                }
+
+                if (nextToken === '[') {
+                    conditionIndex++;
+                    buffer = '';
+                    // Skip next token
+                    i++;
+                    continue;
                 }
 
                 preValueArray = rPath(path, object);
 
                 arrayIndex = preValueArray.findIndex((item) => {
-                    const operator = EQUALITY_SYMBOLS[condition.logicSymbol];
-                    return operator(item[condition.prop], condition.value);
+                    return conditions.every(({ logicSymbol, prop, value }) => {
+                        const operator = EQUALITY_SYMBOLS[logicSymbol];
+                        return operator(item[prop], value);
+                    });
                 });
 
                 if (arrayIndex === -1) {
@@ -119,6 +136,10 @@ const resolvePaths = (unResolvedPath, object) => {
 
                 path.push(arrayIndex);
                 buffer = '';
+
+                // Reset conditions state
+                conditions = [];
+                conditionIndex = 0;
             break;
 
             default:
