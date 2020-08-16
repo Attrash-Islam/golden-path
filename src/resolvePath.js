@@ -16,7 +16,7 @@ const EQUALITY_SYMBOLS = {
     '<=': (x, y) => x <= y
 };
 
-const resolvePaths = (unResolvedPath, object) => {
+const resolvePath = (unResolvedPath, object) => {
     let path = [];
 
     let i = 0;
@@ -24,6 +24,7 @@ const resolvePaths = (unResolvedPath, object) => {
     let conditions = [];
     let conditionIndex = 0;
     let isUserInput = false;
+    let isGreedyQuery = false;
 
     while (i < unResolvedPath.length) {
         const isLast = i === unResolvedPath.length - 1;
@@ -34,6 +35,11 @@ const resolvePaths = (unResolvedPath, object) => {
         let preValueArray;
         let arrayIndex;
         let isTokenHash;
+
+        const satisfyTheQuery = (item) => conditions.every(({ logicSymbol, prop, value }) => {
+            const operator = EQUALITY_SYMBOLS[logicSymbol];
+            return operator(item[prop], value);
+        });
 
         isTokenHash = token === TOKEN_HASH[0] && unResolvedPath.slice(i, TOKEN_HASH.length + i) === TOKEN_HASH;
 
@@ -64,6 +70,7 @@ const resolvePaths = (unResolvedPath, object) => {
 
             case '.':
                 if (buffer) { path.push(normalizedBuffer); }
+                isGreedyQuery = false;
                 buffer = '';
             break;
 
@@ -105,6 +112,12 @@ const resolvePaths = (unResolvedPath, object) => {
                 buffer = '';
             break;
 
+            case '*':
+                if (nextToken === '[') {
+                    isGreedyQuery = true;
+                }
+            break;
+
             case ']':
                 if (!conditions[conditionIndex].value) {
                     conditions[conditionIndex].value = parseIt(buffer);
@@ -121,12 +134,37 @@ const resolvePaths = (unResolvedPath, object) => {
 
                 preValueArray = rPath(path, object);
 
-                arrayIndex = preValueArray.findIndex((item) => {
-                    return conditions.every(({ logicSymbol, prop, value }) => {
-                        const operator = EQUALITY_SYMBOLS[logicSymbol];
-                        return operator(item[prop], value);
-                    });
-                });
+                if (isGreedyQuery) {
+                    const ids = preValueArray.reduce((acc, item, idx) => {
+                        if (satisfyTheQuery(item)) {
+                            return [...acc, idx];
+                        }
+
+                        return acc;
+                    }, []);
+
+                    if (ids.length === 0) {
+                        return {
+                            path,
+                            notExist: true
+                        };
+                    } else {
+                        let finalPaths = [];
+
+                        const results = ids.map((id) => resolvePath(`${path.join('.')}.${id}${unResolvedPath.slice(i + 1)}`));
+                        results.forEach(({ path, notExist, paths }) => {
+                            if (notExist) { return; }
+                            if (path) { finalPaths.push(path); }
+                            if (paths) { finalPaths = finalPaths.concat(paths); }
+                        });
+
+                        return {
+                            paths: finalPaths
+                        };
+                    }
+                }
+
+                arrayIndex = preValueArray.findIndex(satisfyTheQuery);
 
                 if (arrayIndex === -1) {
                     return {
@@ -158,4 +196,4 @@ const resolvePaths = (unResolvedPath, object) => {
     return { path };
 };
 
-export default resolvePaths;
+export default resolvePath;

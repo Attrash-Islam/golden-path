@@ -111,6 +111,12 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 1, other: true }] });
             });
 
+            it('should update all existence when conditions satisfied for greedy queries', () => {
+                const object = { peoples: [{ id: 1 }, { id: 1, other: true }] };
+                const result = update(`peoples*[id=1]`, { id: 10, name: 'islam' }, object);
+                expect(result).toEqual({ peoples: [{ id: 10, name: 'islam' }, { id: 10, name: 'islam' }] });
+            });
+
             it('should update relevant existence when multiple conditions are used', () => {
                 const object = { peoples: [{ id: 1, other: false }, { id: 1, other: true }] };
                 const result = update(`peoples[id=1][other=true]`, { id: 10, name: 'islam' }, object);
@@ -147,6 +153,12 @@ describe('update', () => {
                 const object = { peoples: [{ id: 1, name: 'islam' }, { id: 10, name: 'sabel' }] };
                 const result = update(`peoples[id=1].name`, 'sabel', object);
                 expect(result).toEqual({ peoples: [{ id: 1, name: 'sabel' }, { id: 10, name: 'sabel' }] });
+            });
+
+            it('should update array deep property when conditions satisfied', () => {
+                const object = { peoples: [{ id: 1, name: 'islam' }, { id: 1, name: 'sabel' }] };
+                const result = update(`peoples*[id=1].visited`, true, object);
+                expect(result).toEqual({ peoples: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: true }] });
             });
     
             it('should update array deep deep property when conditions satisfied', () => {

@@ -1,28 +1,33 @@
 import { assocPath, path as rPath } from 'ramda';
-import resolvePaths from './resolvePaths';
+import resolvePath from './resolvePath';
 import { TOKEN_HASH } from './constants';
 
 const update = (unResolvedPath, value, object) => {
-    const { path, notExist } = resolvePaths(unResolvedPath, object);
+    let { path, paths, notExist } = resolvePath(unResolvedPath, object);
     if (notExist) { return object; }
+    if (path && !paths) { paths = [path]; }
 
     let objectResult = object;
 
     let newVal = value;
 
-    if (typeof value === 'function') {
-        newVal = value(
-            rPath(path, object)
-        );
+    if (paths) {
+        paths.forEach((p) => {
+            if (typeof value === 'function') {
+                newVal = value(
+                    rPath(p, object)
+                );
+            }
+        
+            objectResult = assocPath(p, newVal, objectResult)
+        });
     }
-
-    objectResult = assocPath(path, newVal, object)
 
     return objectResult;
 };
 
 const get = (unResolvedPath, object) => {
-    const { path, notExist } = resolvePaths(unResolvedPath, object);
+    const { path, notExist } = resolvePath(unResolvedPath, object);
     if (notExist) { return undefined; }
 
     return rPath(path, object);
