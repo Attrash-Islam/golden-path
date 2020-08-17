@@ -53,6 +53,73 @@ const resolvePath = (unResolvedPath, object) => {
             return operator(item[prop], value);
         });
 
+        const getGreedyPaths = () => {
+            const preValueArray = rPath(path, object)
+            const ids = preValueArray.reduce((acc, item, idx) => {
+                if (satisfyTheQuery(item)) {
+                    return [...acc, idx];
+                }
+        
+                return acc;
+            }, []);
+        
+            if (ids.length === 0) {
+                return {
+                    isGreedy: true,
+                    notExist: true
+                };
+            } else {
+                let finalPaths = [];
+        
+                const results = ids.map((id) => {
+                    // When we've such a greedy query:
+                    // `array*[id=1].friends[name="Alex"]`
+                    // and this query match multiple items in the array
+                    // then we need to grab the ids and duplicate the update among all of them.
+                    // In this code we reach the point where we resolve this query to:
+                    //
+                    // `array.0.friends*[name="Alex"]`
+                    // `array.1.friends*[name="Alex"]`
+                    // 
+                    // and then we want to send all of them back to the resolvePath in order
+                    // to continue with the next conditional path.
+                    // Some sort of recursive solution.
+                    //
+                    //  In the next phase the second greedy query will be resolved as well.
+                    // `array.0.friends.3`
+                    // `array.0.friends.5`
+                    // `array.1.friends.4`
+                    // `array.1.friends.8`
+                    // 
+                    let newPath = path.join('.');
+                    const restOfPath = unResolvedPath.slice(i + 1);
+                    if (path.length > 0) {
+                        newPath += '.';
+                    }
+
+                    newPath += id;
+                    if (restOfPath[i] !== '.') {
+                        newPath += '.';
+                    }
+
+                    newPath += restOfPath;
+
+                    return resolvePath(newPath, object);
+                });
+
+                results.forEach(({ path, notExist, paths }) => {
+                    if (notExist) { return; }
+                    if (path) { finalPaths.push(path); }
+                    if (paths) { finalPaths = finalPaths.concat(paths); }
+                });
+        
+                return {
+                    isGreedy: true,
+                    paths: finalPaths
+                };
+            }
+        };
+
         isTokenHash = token === TOKEN_HASH[0] && unResolvedPath.slice(i, TOKEN_HASH.length + i) === TOKEN_HASH;
 
         if (isTokenHash) {
@@ -82,7 +149,12 @@ const resolvePath = (unResolvedPath, object) => {
 
             case '.':
                 if (buffer) { path.push(normalizedBuffer); }
+                if (isGreedyQuery) { return getGreedyPaths(); }
                 isGreedyQuery = false;
+
+                // Reset conditions state
+                conditions = [];
+                conditionIndex = 0;
                 buffer = '';
             break;
 
@@ -125,9 +197,8 @@ const resolvePath = (unResolvedPath, object) => {
             break;
 
             case '*':
-                if (nextToken === '[') {
-                    isGreedyQuery = true;
-                }
+                isGreedyQuery = true;
+                if (isLast) { return getGreedyPaths(); }
             break;
 
             case ']':
@@ -146,36 +217,7 @@ const resolvePath = (unResolvedPath, object) => {
 
                 preValueArray = rPath(path, object);
 
-                if (isGreedyQuery) {
-                    const ids = preValueArray.reduce((acc, item, idx) => {
-                        if (satisfyTheQuery(item)) {
-                            return [...acc, idx];
-                        }
-
-                        return acc;
-                    }, []);
-
-                    if (ids.length === 0) {
-                        return {
-                            isGreedy: true,
-                            notExist: true
-                        };
-                    } else {
-                        let finalPaths = [];
-
-                        const results = ids.map((id) => resolvePath(`${path.join('.')}.${id}${unResolvedPath.slice(i + 1)}`, object));
-                        results.forEach(({ path, notExist, paths }) => {
-                            if (notExist) { return; }
-                            if (path) { finalPaths.push(path); }
-                            if (paths) { finalPaths = finalPaths.concat(paths); }
-                        });
-
-                        return {
-                            isGreedy: true,
-                            paths: finalPaths
-                        };
-                    }
-                }
+                if (isGreedyQuery) { return getGreedyPaths(); }
 
                 arrayIndex = preValueArray.findIndex(satisfyTheQuery);
 

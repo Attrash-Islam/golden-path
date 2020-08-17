@@ -59,6 +59,7 @@ npm i golden-path
 # Supports:
   - First match queries and updates.
   - Greedy (All matches) queries and updates.
+  - Queries in all levels.
   - Multiple queries on the same array items.
   - Sanitization for server dynamic values (in order to not break the parser by any symbols).
   - Comparator operators: = > < >= <= !=

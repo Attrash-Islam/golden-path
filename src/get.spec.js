@@ -136,7 +136,31 @@ describe('get', () => {
                 const result2 = get(`*[id=1].name`, array);
                 expect(result2).toEqual(['islam', 'sabel']);
             });
-    
+
+            it('should return all array items being nested in object when conditions satisfied in greedy queries when being the only the query token', () => {
+                const array = { array: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }] };
+                const result = get(`array.*`, array);
+                expect(result).toEqual([{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }]);
+            });
+
+            it('should return all array items when conditions satisfied in greedy queries when being the only the query token', () => {
+                const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
+                const result = get(`*`, array);
+                expect(result).toEqual([{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }]);
+            });
+
+            it('should return pluck array items property when conditions satisfied in greedy queries', () => {
+                const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
+                const result = get(`*.name`, array);
+                expect(result).toEqual(['islam', 'sabel']);
+            });
+
+            it('should return all array names being nested in object when conditions satisfied in greedy queries when being the only the query token', () => {
+                const array = { array: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }] };
+                const result = get(`array.*.name`, array);
+                expect(result).toEqual(['islam', 'sabel']);
+            });
+ 
             it('should return array deep deep property when conditions satisfied', () => {
                 const object = { peoples: [{ name: 'islam', friends: [{ sex: 'male', name: 'max' }, { sex: 'male', name: 'Aseel' }, { sex: 'female', name: 'sabel' } ] } ] };
                 const result = get(`peoples[name='islam'].friends[sex='male'].name`, object);

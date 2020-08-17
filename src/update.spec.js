@@ -147,6 +147,30 @@ describe('update', () => {
                 expect(result).toEqual({ peoples: [{ id: 1, other: false }, { id: 10, name: 'islam' }] });
             });
 
+            it('should update all array items being nested in object when conditions satisfied in greedy queries when being the only the query token', () => {
+                const array = { array: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }] };
+                const result = update(`array.*`, 1, array);
+                expect(result).toEqual({ array: [1, 1] });
+            });
+
+            it('should update all array items when conditions satisfied in greedy queries when being the only the query token', () => {
+                const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
+                const result = update(`*`, 2, array);
+                expect(result).toEqual([2, 2]);
+            });
+
+            it('should update pluck array items property when conditions satisfied in greedy queries', () => {
+                const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
+                const result = update(`*.name`, 'newName', array);
+                expect(result).toEqual([{ id: 1, name: 'newName', visited: true }, { id: 1, name: 'newName', visited: false }]);
+            });
+
+            it('should update all array names being nested in object when conditions satisfied in greedy queries when being the only the query token', () => {
+                const array = { array: [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }] };
+                const result = update(`array.*.name`, 'newName', array);
+                expect(result).toEqual({ array: [{ id: 1, name: 'newName', visited: true }, { id: 1, name: 'newName', visited: false }] });
+            });
+
             it('should update second item when first item type is not identical when conditions satisfied', () => {
                 const object = { peoples: [{ id: '1' }, { id: 1 }] };
                 const result = update(`peoples[id=1]`, { id: 10, name: 'islam' }, object);
