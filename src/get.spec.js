@@ -128,6 +128,15 @@ describe('get', () => {
                 expect(result).toEqual([]);
             });
 
+            it('should return array deep property when conditions satisfied in non-greedy queries when being the first token', () => {
+                const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
+                const result = get(`[id=1]`, array);
+                expect(result).toEqual({ id: 1, name: 'islam', visited: true });
+
+                const result2 = get(`[id=1].name`, array);
+                expect(result2).toEqual('islam');
+            });
+
             it('should return array deep property when conditions satisfied in greedy queries when being the first token', () => {
                 const array = [{ id: 1, name: 'islam', visited: true }, { id: 1, name: 'sabel', visited: false }];
                 const result = get(`*[id=1]`, array);
