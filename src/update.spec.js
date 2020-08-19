@@ -85,6 +85,16 @@ describe('update', () => {
         expect(result).toEqual({ peoples: [{ id: 3 }] });
     });
 
+    it('should curry the function when less params passed', () => {
+        const object = { peoples: [{ id: 1 } ] };
+        const result = update(`peoples.${0}.id`)(3)(object);
+        expect(result).toEqual({ peoples: [{ id: 3 }] });
+
+        const object2 = { peoples: [{ id: 1 } ] };
+        const result2 = update(`peoples.${0}.id`, 3)(object2);
+        expect(result2).toEqual({ peoples: [{ id: 3 }] });
+    });
+
     it('should update the property path in nested array of objects when function in passed', () => {
         const object = { peoples: [{ id: 1 } ] };
         const result = update(`peoples.${0}.id`, (id) => id + 1, object);

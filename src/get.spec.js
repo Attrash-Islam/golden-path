@@ -37,6 +37,12 @@ describe('get', () => {
         expect(result).toEqual(undefined);
     });
 
+    it('should curry the function when less params passed', () => {
+        const object = { sabel: 'wife' };
+        const result = get('sabel')(object);
+        expect(result).toEqual('wife');
+    });
+
     it('should get the property path in nested array of objects', () => {
         const object = { peoples: [{ id: 1 } ] };
         const result = get(`peoples.${0}.id`, object);

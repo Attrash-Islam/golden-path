@@ -1,8 +1,8 @@
-import { assocPath, path as rPath } from 'ramda';
+import { assocPath, path as rPath, curry } from 'ramda';
 import resolvePath from './resolvePath';
 import { TOKEN_HASH } from './constants';
 
-const update = (unResolvedPath, value, object) => {
+const update = curry((unResolvedPath, value, object) => {
     let { path, paths, notExist } = resolvePath(unResolvedPath, object);
     if (notExist) { return object; }
     if (path && !paths) { paths = [path]; }
@@ -24,16 +24,16 @@ const update = (unResolvedPath, value, object) => {
     }
 
     return objectResult;
-};
+});
 
-const get = (unResolvedPath, object) => {
+const get = curry((unResolvedPath, object) => {
     let { path, paths, notExist, isGreedy } = resolvePath(unResolvedPath, object);
     if (notExist) { return isGreedy ? [] : undefined; }
 
     if (path) { return rPath(path, object); }
 
     if (paths) { return paths.map((p) => rPath(p, object)); }
-};
+});
 
 const v = (value) => `${TOKEN_HASH}${value}${TOKEN_HASH}`;
 
