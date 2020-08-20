@@ -44,6 +44,11 @@ get(`peoples*[id=1][age>=20].kind`, object); // ['human', 'robot']
 // The same can be done with update but update will return the whole root object after being updated.
 const object = { peoples: [{ id: 1, age: 20 }, { id: 1, age: 30 }] };
 
+// update can take a value or a function that pass the current value as well!
+update(`peoples*[id=1][age>=20]`, (x) => ({...x, updated: true }), object);
+// { peoples: [{ id: 1, age: 20, updated: true }, { id: 1, age: 30, updated: true }] }
+
+
 // You can build pipelines since get, update functions are curried by default
 const englishUpdaterPipeline = _.flow([
     get(`[lang="en"]`),
@@ -51,10 +56,6 @@ const englishUpdaterPipeline = _.flow([
 ]);
 
 englishUpdaterPipeline([{ lang: 'en' }, { lang: 'ar' }]); // { lang: 'en', isEnglish: true }
-
-// update can take a value or a function that pass the current value as well!
-update(`peoples*[id=1][age>=20]`, (x) => ({...x, updated: true }), object);
-// { peoples: [{ id: 1, age: 20, updated: true }, { id: 1, age: 30, updated: true }] }
 ```
 
 # Install
