@@ -45,12 +45,12 @@ get(`peoples*[id=1][age>=20].kind`, object); // ['human', 'robot']
 const object = { peoples: [{ id: 1, age: 20 }, { id: 1, age: 30 }] };
 
 // You can build pipelines since get, update functions are curried by default
-const englishUpdaterPipeline = flow([
+const englishUpdaterPipeline = _.flow([
     get(`[lang="en"]`),
     update('isEnglish', true)
 ]);
 
-englishUpdaterPipeline([{ lang: 'en' }, { lang: 'ar' }]); // { lang: 'en' }
+englishUpdaterPipeline([{ lang: 'en' }, { lang: 'ar' }]); // { lang: 'en', isEnglish: true }
 
 // update can take a value or a function that pass the current value as well!
 update(`peoples*[id=1][age>=20]`, (x) => ({...x, updated: true }), object);
