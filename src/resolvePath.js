@@ -214,8 +214,8 @@ const resolvePath = (unResolvedPath, object) => {
                     i += 2;
                     continue;
                 }
-
-                preValueArray = rPath(path, object);
+                
+                preValueArray = rPath(path, object) || [];
 
                 if (isGreedyQuery) { return getGreedyPaths(); }
 

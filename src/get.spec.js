@@ -50,6 +50,26 @@ describe('get', () => {
     });
 
     describe('Conditional Gets For Arrays', () => {
+        it('should return empty when conditions path doesn\'t exist', () => {
+            const data = [
+                {
+                  title: 'title one',
+                  description: 'description one'
+                },
+                {
+                  title: 'title two',
+                  description: 'description two'
+                },
+                {
+                  title: 'title three',
+                  description: 'description three'
+                }
+            ];
+    
+            const result = get('*.content[type="islam"].active', data);
+            expect(result).toEqual([]);
+        });
+
         describe('Equals Symbol', () => {
             it('should get array item when conditions satisfied', () => {
                 const object = { peoples: [{ id: 1 }, { id: 5 } ] };
