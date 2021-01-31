@@ -1,9 +1,10 @@
 import { path as rPath } from 'ramda';
 import { TOKEN_HASH } from './constants';
 
+const isNumeric = (value) => /^\d+$/.test(value);
+
 const normalizeBuffer = (buffer) => {
-    const isNumeric = /^\d+$/.test(buffer);
-    if (isNumeric) {
+    if (isNumeric(buffer)) {
         return parseInt(buffer, 10);
     }
 
@@ -16,7 +17,7 @@ const parseIt = (value) => {
     if (value === 'undefined') { return undefined; }
     if (value === 'null') { return null; }
 
-    if (!isNaN(value)) { return Number(value); }
+    if (isNumeric(value)) { return Number(value); }
 
     // If a string.
     if (['\'', '"', '`'].some((x) => value[0] === x && value[value.length - 1] === x)) {
