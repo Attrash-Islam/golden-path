@@ -1,7 +1,14 @@
 import { path as rPath } from 'ramda';
 import { TOKEN_HASH } from './constants';
 
-const normalizeBuffer = (buffer) => isNaN(buffer) ? buffer : parseInt(buffer);
+const normalizeBuffer = (buffer) => {
+    const isNumeric = /^\d+$/.test(buffer);
+    if (isNumeric) {
+        return parseInt(buffer, 10);
+    }
+
+    return buffer;
+}
 
 const parseIt = (value) => {
     if (value === 'true') { return true; }
