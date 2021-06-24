@@ -18,6 +18,9 @@ const update = curry((unResolvedPath, value, object) => {
                     rPath(p, object)
                 );
             }
+
+            const isSameValue = rPath(p, objectResult) === newVal;
+            if (isSameValue) { return; }
         
             objectResult = assocPath(p, newVal, objectResult)
         });
