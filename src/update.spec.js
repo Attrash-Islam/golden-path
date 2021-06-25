@@ -7,6 +7,14 @@ describe('update', () => {
         expect(result).toEqual({ islam: 4 });
     });
 
+    it('should return same reference once key updated with same value', () => {
+        const object = { islam: 1 };
+        const result = update('islam', 1, object);
+
+        // referential equality
+        expect(result).toBe(object);
+    });
+
     it('should update one level path when exist when function is being passed', () => {
         const object = { islam: 1 };
         const result = update('islam', (x) => x + 1, object);
