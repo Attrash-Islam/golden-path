@@ -20,17 +20,7 @@ const update = curry((unResolvedPath, value, object) => {
             }
 
             const isSameValue = rPath(p, objectResult) === newVal;
-            if (isSameValue) {
-                if (typeof window !== 'undefined') {
-                    if (!window.goldenExcludedUpdates) {
-                        window.goldenExcludedUpdates = [];
-                    }
-            
-                    window.goldenExcludedUpdates.push({ k: p });
-                }
-
-                return;
-            }
+            if (isSameValue) { return; }
         
             objectResult = assocPath(p, newVal, objectResult)
         });
