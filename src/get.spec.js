@@ -545,6 +545,6 @@ describe('get', () => {
 
         expect(() => {
             get(path, object);
-        }).toThrow(`Golden Path::Error getting the path "${path}"`);
+        }).toThrow(`Golden Path :: Error getting the path "${path}"`);
     });
 });

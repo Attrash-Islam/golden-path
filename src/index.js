@@ -29,7 +29,7 @@ const update = curry((unResolvedPath, value, object) => {
 
         return objectResult;
     } catch (err) {
-        throw new Error(`Golden Path::Error updating the path "${unResolvedPath}" with the value "${value}"`);
+        throw new Error(`Golden Path :: Error updating the path "${unResolvedPath}" with the value "${value}"`);
     }
 });
 
@@ -42,7 +42,7 @@ const get = curry((unResolvedPath, object) => {
     
         if (paths) { return paths.map((p) => rPath(p, object)); }
     } catch (err) {
-        throw new Error(`Golden Path::Error getting the path "${unResolvedPath}"`);
+        throw new Error(`Golden Path :: Error getting the path "${unResolvedPath}"`);
     }
 });
 
