@@ -599,6 +599,6 @@ describe('update', () => {
 
         expect(() => {
             update(path, value, object);
-        }).toThrow(`Golden Path :: Error updating the path "${path}" with the value "${value}"`);
+        }).toThrow(`Golden Path :: Error updating the path "${path}"`);
     });
 });

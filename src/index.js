@@ -29,7 +29,7 @@ const update = curry((unResolvedPath, value, object) => {
 
         return objectResult;
     } catch (err) {
-        throw new Error(`Golden Path :: Error updating the path "${unResolvedPath}" with the value "${value}"`);
+        throw new Error(`Golden Path :: Error updating the path "${unResolvedPath}"`);
     }
 });
 
