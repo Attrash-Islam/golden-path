@@ -591,4 +591,14 @@ describe('update', () => {
             });
         });
     });
+
+    it('should show readable error when failing', () => {
+        const object = { islam: 1 };
+        const path = 'islam[].[]';
+        const value = 'sabel';
+
+        expect(() => {
+            update(path, value, object);
+        }).toThrow(`Golden Path :: Error updating the path "${path}"`);
+    });
 });

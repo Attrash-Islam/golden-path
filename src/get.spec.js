@@ -538,4 +538,13 @@ describe('get', () => {
             });
         });
     });
+
+    it('should show readable error when failing', () => {
+        const object = { islam: 1 };
+        const path = 'islam[].[]';
+
+        expect(() => {
+            get(path, object);
+        }).toThrow(`Golden Path :: Error getting the path "${path}"`);
+    });
 });
